@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
+#include "../../Bord-Monitor-100/src/dspdata.h"
 
 //
 #define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
@@ -57,10 +58,15 @@ void setup() {
 }
 
 void loop() {
+    DataUnion data;
+    
     static int counter = 0;
 
-    String value = "Counter: " + String(counter++);
-    pCharacteristic->setValue(value.c_str());
+//   String value = "Counter: " + String(counter++);
+//  pCharacteristic->setValue((value.c_str());
+    data.Id= DATA_MOTOR_TEMP;
+    data.Data.Float= counter;
+    pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
     pCharacteristic->notify();
 
     delay(2000);
