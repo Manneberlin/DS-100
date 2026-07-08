@@ -1,6 +1,17 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
+#include <SPI.h>
+//#include "DHTesp.h" // Click here to get the library: http://librarymanager/All#DHTesp
+
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+//#include <BluetoothSerial.h>
+//#include "dspdata.h"
+
+//#include "measure.h"
+
 #include "../../Bord-Monitor-100/src/dspdata.h"
 
 //
@@ -28,8 +39,17 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks {
     }
 };
 
+#define DS18B20_BUS 0
+
+OneWire oneWire(DS18B20_BUS);
+DallasTemperature DS18B20(&oneWire);
+// arrays to hold device addresses
+DeviceAddress WaterThermometer, AirThermometer;
+
 void setup() {
     Serial.begin(115200);
+
+    DS18B20.begin();
 
     NimBLEDevice::init("ESP32-BLE-SERVER");
 
@@ -59,16 +79,21 @@ void setup() {
 
 void loop() {
     DataUnion data;
-    
+    float temp;
     static int counter = 0;
 
 //   String value = "Counter: " + String(counter++);
 //  pCharacteristic->setValue((value.c_str());
+    
+    DS18B20.requestTemperatures();
+    temp= DS18B20.getTempCByIndex(0);   
+    
+    Serial.printf("MotorTemp: %f", temp);
+
     data.Id= DATA_MOTOR_TEMP;
     data.Data.Float= counter;
-    pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
+    pCharacteristic->setValue() ((uint8_t*)&data, sizeof(DataUnion));
     pCharacteristic->notify();
 
     delay(2000);
-    Serial.print('.');
 }
