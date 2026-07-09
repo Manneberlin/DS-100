@@ -88,11 +88,11 @@ void loop() {
     DS18B20.requestTemperatures();
     temp= DS18B20.getTempCByIndex(0);   
     
-    Serial.printf("MotorTemp: %f", temp);
+    Serial.printf("MotorTemp: %5.1f\n", temp);
 
     data.Id= DATA_MOTOR_TEMP;
-    data.Data.Float= counter;
-    pCharacteristic->setValue() ((uint8_t*)&data, sizeof(DataUnion));
+    data.Data.Float= temp;
+    pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
     pCharacteristic->notify();
 
     delay(2000);
