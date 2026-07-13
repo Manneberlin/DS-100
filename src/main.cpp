@@ -97,6 +97,7 @@ void loop() {
 //   String value = "Counter: " + String(counter++);
 //  pCharacteristic->setValue((value.c_str());
     
+
     datatype++;
     Serial.printf("#%d ", datatype);
     switch(datatype)
