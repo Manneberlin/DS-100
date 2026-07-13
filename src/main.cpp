@@ -3,7 +3,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#define VERSION "0.0.0.1" 
+#define VERSION "0.0.0.2" 
 
 #include <Arduino.h>
 #include <NimBLEDevice.h>
@@ -81,26 +81,65 @@ void setup() {
     pAdvertising->addServiceUUID(SERVICE_UUID);
     pAdvertising->start();
 
+    delay(1000);
+    Serial.print("DS-100 version ");
+    Serial.println(VERSION);
     Serial.println("\nBLE Server gestartet");
+    Serial.println(NimBLEDevice::getAddress().toString().c_str());
 }
 
 void loop() {
     DataUnion data;
     float temp;
-    static int counter = 0;
-
+    static int speed = 800;
+    static int press = 100;
+    static int datatype= 0;
 //   String value = "Counter: " + String(counter++);
 //  pCharacteristic->setValue((value.c_str());
     
-    DS18B20.requestTemperatures();
-    temp= DS18B20.getTempCByIndex(0);   
+    datatype++;
+    Serial.printf("#%d ", datatype);
+    switch(datatype)
+    {
+        case 1:
+            DS18B20.requestTemperatures();
+            temp= DS18B20.getTempCByIndex(0);   
     
-    Serial.printf("MotorTemp: %5.1f\n", temp);
+            Serial.printf("MotorTemp: %5.1f\n", temp);
 
-    data.Id= DATA_MOTOR_TEMP;
-    data.Data.Float= temp;
-    pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
-    pCharacteristic->notify();
+            data.Id= DATA_MOTOR_TEMP;
+            data.Data.Float= temp;
+            pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
+            pCharacteristic->notify();
+            break;
 
-    delay(2000);
+        case 2:
+            Serial.printf("MotorDrehzahl: %d\n", speed);
+            data.Id= DATA_MOTOR_SPEED;
+            data.Data.Integer= speed;
+            pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
+            pCharacteristic->notify();
+            speed++;
+            if(speed > 3200)
+                speed= 800;
+            break;
+
+        case 3:
+            Serial.printf("MotorÖldruck: %d\n", press);
+            data.Id= DATA_MOTOR_OEL;
+            data.Data.Integer= press;
+            pCharacteristic->setValue((uint8_t*)&data, sizeof(DataUnion));
+            pCharacteristic->notify();
+            press++;
+            if(press > 200)
+                press= 100;
+            break;
+
+        default:
+            datatype= 0;
+            Serial.println("");
+            break;
+    }
+
+    delay(1000);
 }
