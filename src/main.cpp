@@ -36,7 +36,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 //
 
-// #include "version.h"
+#include "version.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Hardware defines
@@ -58,7 +58,7 @@
 
 
 
-#define VERSION "0.0.0.2" 
+// #define VERSION "0.0.0.2" 
 
 #include <Arduino.h>
 #include <NimBLEDevice.h>
@@ -76,13 +76,49 @@
 
 #include "../../Bord-Monitor-100/src/dspdata.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// BLE Variablen - Konstanten
 //
 #define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
 #define CHARACTERISTIC_UUID "abcdefab-1234-1234-1234-abcdefabcdef"
 
 NimBLECharacteristic* pCharacteristic;
 
-class ServerCallbacks : public NimBLEServerCallbacks {
+////////////////////////////////////////////////////////////////////////////////
+//
+
+
+void LedOn(bool on)
+{
+    if(on)  
+        digitalWrite(LED_BLUE, LOW);
+    else
+      digitalWrite(LED_BLUE, HIGH);
+}
+
+void LedTgl(void)
+{
+    if(digitalRead(LED_BLUE))  
+        digitalWrite(LED_BLUE, LOW);
+    else
+      digitalWrite(LED_BLUE, HIGH);
+}
+
+bool Key(void)
+{
+  bool pressed= false;
+
+  if(!digitalRead(KEY_ON_BOARD))
+    pressed=true;
+
+    return pressed;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+
+class ServerCallbacks : public NimBLEServerCallbacks 
+{
     void onConnect(NimBLEServer* pServer) {
         Serial.println("Client verbunden");
     }
@@ -136,9 +172,15 @@ void setup() {
     pAdvertising->addServiceUUID(SERVICE_UUID);
     pAdvertising->start();
 
+    // LED
+    digitalWrite(LED_BLUE, HIGH);
+    pinMode(LED_BLUE, OUTPUT);
+    // Taster
+    pinMode(KEY_ON_BOARD, INPUT_PULLUP);
+
     delay(1000);
     Serial.print("DS-100 version ");
-    Serial.println(VERSION);
+    Serial.println(VERSION_STR);
     Serial.println("\nBLE Server gestartet");
     Serial.println(NimBLEDevice::getAddress().toString().c_str());
 }
@@ -196,6 +238,6 @@ void loop() {
             Serial.println("");
             break;
     }
-
+    LedTgl();
     delay(1000);
 }
