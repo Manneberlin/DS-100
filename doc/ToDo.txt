@@ -1,0 +1,10 @@
+BM-100 Bordmonitor 
+ToDo
+
+#   Datum       Reali.      Version Aufgabe
+1   16.07.26    16.07.26            ToDo Liste anlegen
+2   16.07.26    16.07.26    0.0.0.3 LED (on Board, blau) zur Laufzeitkontrolle blinken
+3   14.07.26                        HW für Motordrehzahl
+4   14.07.26                        HW für Öldruck
+5   16.07.26                        Message, BLE Daten in mehrfach Packet senden. ID= 0, leeres Paket, ID= 1 Mehrfachpaket
+6   16.07.26                        Fahler und Alarme senden
